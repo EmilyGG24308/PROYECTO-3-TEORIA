@@ -1,0 +1,66 @@
+# Reconocedora de L = { a^n b^n c^n | n >= 1 }
+# En cada ronda marca una a con X, una b con Y y una c con Z.
+# Cuando ya no quedan a sin marcar, revisa que solo queden Y, Z y luego blanco.
+# Esta máquina no necesita la memoria finita, por eso queda siempre en null.
+
+q_states:
+  q_list: ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6']
+  initial: 'q0'
+  final: 'q6'
+
+alphabet: ['a', 'b', 'c']
+
+tape_alphabet: ['a', 'b', 'c', 'X', 'Y', 'Z', null]
+
+delta:
+  # q0: marca la siguiente a, o si ya no hay a pasa a revisar el final
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: 'a'}
+    output: {final_state: 'q1', mem_cache_value: null, tape_output: 'X', tape_displacement: R}
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: 'Y'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'Y', tape_displacement: R}
+
+  # q1: avanza sobre a y Y hasta la primera b sin marcar
+  - params: {initial_state: 'q1', mem_cache_value: null, tape_input: 'a'}
+    output: {final_state: 'q1', mem_cache_value: null, tape_output: 'a', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: null, tape_input: 'Y'}
+    output: {final_state: 'q1', mem_cache_value: null, tape_output: 'Y', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: null, tape_input: 'b'}
+    output: {final_state: 'q2', mem_cache_value: null, tape_output: 'Y', tape_displacement: R}
+
+  # q2: avanza sobre b y Z hasta la primera c sin marcar
+  - params: {initial_state: 'q2', mem_cache_value: null, tape_input: 'b'}
+    output: {final_state: 'q2', mem_cache_value: null, tape_output: 'b', tape_displacement: R}
+  - params: {initial_state: 'q2', mem_cache_value: null, tape_input: 'Z'}
+    output: {final_state: 'q2', mem_cache_value: null, tape_output: 'Z', tape_displacement: R}
+  - params: {initial_state: 'q2', mem_cache_value: null, tape_input: 'c'}
+    output: {final_state: 'q3', mem_cache_value: null, tape_output: 'Z', tape_displacement: L}
+
+  # q3: regresa a la izquierda hasta la ultima X
+  - params: {initial_state: 'q3', mem_cache_value: null, tape_input: 'a'}
+    output: {final_state: 'q3', mem_cache_value: null, tape_output: 'a', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: null, tape_input: 'b'}
+    output: {final_state: 'q3', mem_cache_value: null, tape_output: 'b', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: null, tape_input: 'Y'}
+    output: {final_state: 'q3', mem_cache_value: null, tape_output: 'Y', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: null, tape_input: 'Z'}
+    output: {final_state: 'q3', mem_cache_value: null, tape_output: 'Z', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: null, tape_input: 'X'}
+    output: {final_state: 'q0', mem_cache_value: null, tape_output: 'X', tape_displacement: R}
+
+  # q4: ya no hay a, solo pueden seguir Y
+  - params: {initial_state: 'q4', mem_cache_value: null, tape_input: 'Y'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'Y', tape_displacement: R}
+  - params: {initial_state: 'q4', mem_cache_value: null, tape_input: 'Z'}
+    output: {final_state: 'q5', mem_cache_value: null, tape_output: 'Z', tape_displacement: R}
+
+  # q5: solo pueden seguir Z y despues el blanco
+  - params: {initial_state: 'q5', mem_cache_value: null, tape_input: 'Z'}
+    output: {final_state: 'q5', mem_cache_value: null, tape_output: 'Z', tape_displacement: R}
+  - params: {initial_state: 'q5', mem_cache_value: null, tape_input: null}
+    output: {final_state: 'q6', mem_cache_value: null, tape_output: null, tape_displacement: S}
+
+simulation_strings:
+  - 'aaabbbccc'
+  - 'aaaabbbbcccc'
+  - 'aaabbbbccc'
+  - 'aabbccabc'

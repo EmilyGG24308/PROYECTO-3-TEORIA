@@ -1,0 +1,103 @@
+# Alteradora: invierte una cadena binaria en la misma cinta.
+# En cada ronda intercambia el primer y el ultimo simbolo que faltan,
+# usando la memoria finita para cargar el simbolo que se esta moviendo.
+#   '*' = hueco donde va a caer el ultimo simbolo
+#   'x' = 0 ya colocado, 'y' = 1 ya colocado
+# Al final regresa al inicio y cambia x por 0 y y por 1, sin dejar marcas.
+
+q_states:
+  q_list: ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6']
+  initial: 'q0'
+  final: 'q6'
+
+alphabet: ['0', '1']
+
+tape_alphabet: ['0', '1', 'x', 'y', '*', null]
+
+delta:
+  # q0: toma el primer simbolo pendiente, lo guarda en memoria y deja un hueco
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: '0'}
+    output: {final_state: 'q1', mem_cache_value: '0', tape_output: '*', tape_displacement: R}
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: '1'}
+    output: {final_state: 'q1', mem_cache_value: '1', tape_output: '*', tape_displacement: R}
+  # si ya esta colocado, ya no quedan pendientes y se pasa a limpiar
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: 'x'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'x', tape_displacement: S}
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: 'y'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'y', tape_displacement: S}
+  # la cadena vacia ya esta invertida
+  - params: {initial_state: 'q0', mem_cache_value: null, tape_input: null}
+    output: {final_state: 'q6', mem_cache_value: null, tape_output: null, tape_displacement: S}
+
+  # q1: va a la derecha hasta el final de la parte pendiente
+  - params: {initial_state: 'q1', mem_cache_value: '0', tape_input: '0'}
+    output: {final_state: 'q1', mem_cache_value: '0', tape_output: '0', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: '0', tape_input: '1'}
+    output: {final_state: 'q1', mem_cache_value: '0', tape_output: '1', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: '1', tape_input: '0'}
+    output: {final_state: 'q1', mem_cache_value: '1', tape_output: '0', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: '1', tape_input: '1'}
+    output: {final_state: 'q1', mem_cache_value: '1', tape_output: '1', tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: '0', tape_input: 'x'}
+    output: {final_state: 'q2', mem_cache_value: '0', tape_output: 'x', tape_displacement: L}
+  - params: {initial_state: 'q1', mem_cache_value: '0', tape_input: 'y'}
+    output: {final_state: 'q2', mem_cache_value: '0', tape_output: 'y', tape_displacement: L}
+  - params: {initial_state: 'q1', mem_cache_value: '0', tape_input: null}
+    output: {final_state: 'q2', mem_cache_value: '0', tape_output: null, tape_displacement: L}
+  - params: {initial_state: 'q1', mem_cache_value: '1', tape_input: 'x'}
+    output: {final_state: 'q2', mem_cache_value: '1', tape_output: 'x', tape_displacement: L}
+  - params: {initial_state: 'q1', mem_cache_value: '1', tape_input: 'y'}
+    output: {final_state: 'q2', mem_cache_value: '1', tape_output: 'y', tape_displacement: L}
+  - params: {initial_state: 'q1', mem_cache_value: '1', tape_input: null}
+    output: {final_state: 'q2', mem_cache_value: '1', tape_output: null, tape_displacement: L}
+
+  # q2: en el ultimo pendiente deja el simbolo de memoria ya colocado y se lleva el que estaba ahi
+  - params: {initial_state: 'q2', mem_cache_value: '0', tape_input: '0'}
+    output: {final_state: 'q3', mem_cache_value: '0', tape_output: 'x', tape_displacement: L}
+  - params: {initial_state: 'q2', mem_cache_value: '0', tape_input: '1'}
+    output: {final_state: 'q3', mem_cache_value: '1', tape_output: 'x', tape_displacement: L}
+  - params: {initial_state: 'q2', mem_cache_value: '1', tape_input: '0'}
+    output: {final_state: 'q3', mem_cache_value: '0', tape_output: 'y', tape_displacement: L}
+  - params: {initial_state: 'q2', mem_cache_value: '1', tape_input: '1'}
+    output: {final_state: 'q3', mem_cache_value: '1', tape_output: 'y', tape_displacement: L}
+  # si el ultimo pendiente es el mismo hueco, es el centro de una cadena impar
+  - params: {initial_state: 'q2', mem_cache_value: '0', tape_input: '*'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'x', tape_displacement: S}
+  - params: {initial_state: 'q2', mem_cache_value: '1', tape_input: '*'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'y', tape_displacement: S}
+
+  # q3: regresa a la izquierda hasta el hueco y deja ahi el simbolo de memoria
+  - params: {initial_state: 'q3', mem_cache_value: '0', tape_input: '0'}
+    output: {final_state: 'q3', mem_cache_value: '0', tape_output: '0', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: '0', tape_input: '1'}
+    output: {final_state: 'q3', mem_cache_value: '0', tape_output: '1', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: '1', tape_input: '0'}
+    output: {final_state: 'q3', mem_cache_value: '1', tape_output: '0', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: '1', tape_input: '1'}
+    output: {final_state: 'q3', mem_cache_value: '1', tape_output: '1', tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: '0', tape_input: '*'}
+    output: {final_state: 'q0', mem_cache_value: null, tape_output: 'x', tape_displacement: R}
+  - params: {initial_state: 'q3', mem_cache_value: '1', tape_input: '*'}
+    output: {final_state: 'q0', mem_cache_value: null, tape_output: 'y', tape_displacement: R}
+
+  # q4: va al inicio de la cadena
+  - params: {initial_state: 'q4', mem_cache_value: null, tape_input: 'x'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'x', tape_displacement: L}
+  - params: {initial_state: 'q4', mem_cache_value: null, tape_input: 'y'}
+    output: {final_state: 'q4', mem_cache_value: null, tape_output: 'y', tape_displacement: L}
+  - params: {initial_state: 'q4', mem_cache_value: null, tape_input: null}
+    output: {final_state: 'q5', mem_cache_value: null, tape_output: null, tape_displacement: R}
+
+  # q5: quita las marcas y acepta al llegar al blanco
+  - params: {initial_state: 'q5', mem_cache_value: null, tape_input: 'x'}
+    output: {final_state: 'q5', mem_cache_value: null, tape_output: '0', tape_displacement: R}
+  - params: {initial_state: 'q5', mem_cache_value: null, tape_input: 'y'}
+    output: {final_state: 'q5', mem_cache_value: null, tape_output: '1', tape_displacement: R}
+  - params: {initial_state: 'q5', mem_cache_value: null, tape_input: null}
+    output: {final_state: 'q6', mem_cache_value: null, tape_output: null, tape_displacement: S}
+
+simulation_strings:
+  - '00101'
+  - '110010'
+  - '1011001'
+  - '00011'
