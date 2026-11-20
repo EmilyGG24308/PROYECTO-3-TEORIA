@@ -1,6 +1,7 @@
 # Proyecto 3 — Simulador de Máquinas de Turing
 
-Simulador de Máquinas de Turing de una cinta con memoria finita. La máquina y las cadenas se definen en un YAML; el programa muestra todas las descripciones instantáneas, la cinta final y si cada cadena fue aceptada o rechazada.
+## Video
+https://canva.link/3vc22x8nu2jaxna
 
 ## Instalación y uso
 
@@ -47,15 +48,7 @@ La simulación para con:
 - **RECHAZADA**: no hay transición para (estado, memoria, símbolo).
 - **LÍMITE DE PASOS ALCANZADO**: se llegó a `--max-steps`; no se considera rechazo.
 
-## Arquitectura
 
-| Archivo | Función |
-|---|---|
-| `main.py` | consola y presentación |
-| `mt/lector.py` | lectura y validación del YAML |
-| `mt/maquina.py` | máquina y transiciones `(estado, memoria, símbolo) → transición` |
-| `mt/cinta.py` | cinta infinita a ambos lados |
-| `mt/simulador.py` | motor de simulación |
 
 ## Máquinas de ejemplo
 
